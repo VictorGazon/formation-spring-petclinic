@@ -1,6 +1,26 @@
 pipeline {
     agent any
     
+	parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['STAGING', 'PROD'], description: 'Choisir l\'environnement de déploiement')
+        booleanParam(name: 'SKIP_TESTS', defaultValue: false, description: 'Ignorer les tests')
+        booleanParam(name: 'ARCHIVE_ARTIFACT', defaultValue: true, description: 'Archiver l\'artefact après le build')
+    }
+    
+    environment {
+        // Variables globales
+        TOMCAT_URL = "https://192.168.56.13:8080"
+        TOMCAT_USER = "deployer"
+        TOMCAT_PASSWORD = "deployer"
+        MYSQL_HOST = "192.168.56.14"
+        MYSQL_USER = "petclinic"
+        MYSQL_PASSWORD = "petclinic"
+        APP_NAME = "petclinic"
+        
+        // Répertoire pour les artefacts
+        ARTIFACTS_DIR = "${JENKINS_HOME}/artifacts/${APP_NAME}"
+    }
+	
     tools {
         jdk 'localJDK'
         maven 'localMaven'
