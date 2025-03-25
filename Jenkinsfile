@@ -6,11 +6,6 @@ pipeline {
         maven 'localMaven'
     }
     
-    environment {
-        SONAR_SCANNER_HOME = tool 'SonarQube Scanner'
-        PROJECT_KEY = 'spring-petclinic'
-    }
-    
     stages {
         stage('Checkout') {
             steps {
