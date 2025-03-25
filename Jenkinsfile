@@ -68,13 +68,33 @@ pipeline {
             }
         }
 		
-		stage('Sonar Analysis') {
+		stage('Code Coverage') {
             steps {
-                echo 'Run sonarQube Analysis'
-                withSonarQubeEnv(installationName : 'sonarServer' , credentialsId : 'token4sonar') 
-                {
-                    sh "mvn clean package sonar:sonar"
-                    }
+                echo 'Code coverage Measurement'
+                sh'mvn jacoco:report'
+                // publication 
+                jacoco(
+                    execPattern: 'target/jacoco.exec',
+                    classPattern: 'target/classes',
+                    sourcePattern: 'src/main/java',
+                    exclusionPattern: 'src/test/**'
+                )
+            }
+        }
+    
+		stage('Code Analysis') {
+            steps {
+                // Exécution de Checkstyle
+                sh 'mvn checkstyle:checkstyle'
+                // Exécution de SpotBugs
+                sh 'mvn spotbugs:spotbugs'
+                // Publication des rapports d'analyse
+                recordIssues(
+                    tools: [
+                        checkStyle(pattern: 'target/checkstyle-result.xml'),
+                        spotBugs(pattern: 'target/spotbugsXml.xml')
+                    ]
+                )
             }
         }
                 
